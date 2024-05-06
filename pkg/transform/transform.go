@@ -8,6 +8,22 @@ import (
 	"github.com/blutz1982/go-nsexporter-libreview/pkg/nightscout"
 )
 
+func LibreUnscheduledContinuousGlucoseEntryToSensorStart(e *libreview.UnscheduledContinuousGlucoseEntry) *libreview.GenericEntry {
+	return &libreview.GenericEntry{
+		Type: "com.abbottdiabetescare.informatics.sensorstart",
+		ExtendedProperties: libreview.GenericExtendedProperties{
+			FactoryTimestamp: e.ExtendedProperties.FactoryTimestamp,
+			Gmin:             "40",
+			Gmax:             "500",
+			WearDuration:     "20160",
+			WarmupTime:       "60",
+			ProductType:      "2",
+		},
+		RecordNumber: libreview.RecordNumberIncrementGeneric + e.Timestamp.Unix(),
+		Timestamp:    e.Timestamp,
+	}
+}
+
 func NSToLibreScheduledGlucoseEntry(e *nightscout.GlucoseEntry) *libreview.ScheduledContinuousGlucoseEntry {
 
 	return &libreview.ScheduledContinuousGlucoseEntry{
@@ -19,8 +35,8 @@ func NSToLibreScheduledGlucoseEntry(e *nightscout.GlucoseEntry) *libreview.Sched
 			IsFirstAfterTimeChange: false,
 			CanMerge:               "true",
 		},
-		RecordNumber: libreview.RecordNumberIncrement + e.DateString.Unix(),
-		Timestamp:    e.DateString.Local(),
+		RecordNumber: libreview.RecordNumberIncrement + e.Date.Time().Unix(),
+		Timestamp:    e.Date.Time().Local(),
 	}
 }
 
@@ -36,8 +52,8 @@ func NSToLibreUnscheduledGlucoseEntry(e *nightscout.GlucoseEntry) *libreview.Uns
 			TrendArrow:             ToLibreDirection(e.Direction),
 			IsActionable:           true,
 		},
-		RecordNumber: libreview.RecordNumberIncrementUnscheduled + e.DateString.Unix(),
-		Timestamp:    e.DateString.Local().Add(duration),
+		RecordNumber: libreview.RecordNumberIncrementUnscheduled + e.Date.Time().Unix(),
+		Timestamp:    e.Date.Time().Local().Add(duration),
 	}
 }
 
